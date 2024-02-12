@@ -1,5 +1,7 @@
 # Grizzly Cron Scheduler
 
+[![](https://docs.rs/grizzly_scheduler/badge.svg)](https://docs.rs/grizzly_scheduler) [![](https://img.shields.io/crates/v/grizzly_scheduler.svg)](https://crates.io/crates/grizzly_scheduler)
+
 A simple and easy to use scheduler, built on top of Tokio, that allows you to schedule async tasks using cron expressions (with optional random fuzzy offsets for each trigger).
 
 Tasks can be of two types:
