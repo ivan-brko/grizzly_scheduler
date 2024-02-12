@@ -2,6 +2,14 @@
 name = "grizzly_scheduler"
 version = "0.1.0"
 edition = "2021"
+authors = ["Ivan Brko"]
+license-file = "LICENSE"
+description = "A scheduler for running async tasks using cron expressions. It is built on top of tokio. Tasks can be parallel or sequential. Fuzzy random offset can be added to the cron expression."
+homepage = "https://github.com/ivan-brko/grizzly_scheduler"
+repository = "https://github.com/ivan-brko/grizzly_scheduler"
+documentation = "https://docs.rs/grizzly_scheduler"
+readme = "README.md"
+keywords = ["scheduler", "cron", "async", "tokio", "fuzzy"]
 
 [dependencies]
 cron = "0.12"
