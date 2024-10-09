@@ -32,6 +32,7 @@ let cloned_state = important_shared_state.clone();
 let job_id = scheduler.schedule_parallel_job(
        "*/5 * * * * *",                          // run the job on every second divisible by 5 of every minute
        Some("Example Parallel Job".to_string()), // this name will appear in the tracing logs
+       Some("Some Category".to_string()),        // we can use this to stop all tasks of single category
        Some(chrono::Duration::seconds(2)),       // we want the fuzzy effect of maximally +/-2 seconds
        move ||
           {
