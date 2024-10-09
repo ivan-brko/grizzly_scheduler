@@ -96,6 +96,45 @@ where
             Err(JobNotFoundError(job_id.as_str().to_string()))
         }
     }
+
+    pub(super) fn stop_all_jobs(&mut self) {
+        info!("Grizzly Scheduler: Stopping all jobs");
+        for (job_id, started_job) in self.started_jobs.iter() {
+            debug!(
+                "Grizzly Scheduler: Stopping job with id {} and human readable name {}",
+                job_id,
+                started_job
+                    .human_readable_name
+                    .as_deref()
+                    .unwrap_or("NOT SET")
+            );
+            started_job.cancellation_token.cancel();
+        }
+    }
+
+    pub(super) fn stop_jobs_by_category(&mut self, category: &str) {
+        info!("Grizzly Scheduler: Stopping jobs in category: {}", category);
+        let job_ids_to_stop: Vec<String> = self
+            .started_jobs
+            .iter()
+            .filter(|(_, started_job)| started_job.category.as_deref() == Some(category))
+            .map(|(job_id, _)| job_id.clone())
+            .collect();
+
+        for job_id in job_ids_to_stop {
+            if let Some(started_job) = self.started_jobs.remove(&job_id) {
+                debug!(
+                    "Grizzly Scheduler: Stopping job with id {} and human readable name {}",
+                    job_id,
+                    started_job
+                        .human_readable_name
+                        .as_deref()
+                        .unwrap_or("NOT SET")
+                );
+                started_job.cancellation_token.cancel();
+            }
+        }
+    }
 }
 
 impl<TZ> Drop for SchedulerInner<TZ>

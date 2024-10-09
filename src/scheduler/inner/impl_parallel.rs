@@ -18,6 +18,7 @@ where
         &mut self,
         cron_string: &str,
         human_readable_name: Option<String>,
+        category: Option<String>,
         fuzzy_offset: Option<chrono::Duration>,
         f: F,
     ) -> SchedulerResult<JobId>
@@ -38,6 +39,7 @@ where
             job_id.clone(),
             NotStartedJob {
                 human_readable_name,
+                category,
                 parsed_cron,
                 lambda: Box::new(move || f().boxed()),
                 fuzzy_offset,
@@ -120,6 +122,7 @@ where
                     cancellation_token,
                     join,
                     human_readable_name: job.human_readable_name,
+                    category: job.category,
                 },
             );
         }
@@ -146,7 +149,7 @@ mod tests {
 
         // Job that increments the counter every 2 seconds
         scheduler
-            .schedule_parallel_job("*/2 * * * * *", None, None, move || {
+            .schedule_parallel_job("*/2 * * * * *", None, None, None, move || {
                 let cc_counter = Arc::clone(&c_counter);
                 async move {
                     cc_counter.fetch_add(1, Ordering::Relaxed);
@@ -180,7 +183,7 @@ mod tests {
 
         // Job that increments the counter every 2 seconds
         scheduler
-            .schedule_parallel_job("*/2 * * * * *", None, None, move || {
+            .schedule_parallel_job("*/2 * * * * *", None, None, None, move || {
                 let cc_counter = Arc::clone(&c_counter);
                 async move {
                     cc_counter.fetch_add(1, Ordering::SeqCst);

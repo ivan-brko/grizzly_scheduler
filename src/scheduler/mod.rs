@@ -118,6 +118,7 @@ where
     /// let job_id = scheduler.schedule_parallel_job(
     ///         "*/5 * * * * *",     // run the job on every second divisible by 5 of every minute
     ///         Some("Example Parallel Job".to_string()), //this name will appear in the tracing logs
+    ///         Some("Example Category".to_string()), //this category will appear in the tracing logs
     ///         Some(chrono::Duration::seconds(2)), // we want the fuzzy effect of 2 seconds
     ///         move ||
     ///            {
@@ -143,6 +144,7 @@ where
         &self,
         cron_string: &str,
         human_readable_name: Option<String>,
+        category: Option<String>,
         fuzzy_offset: Option<chrono::Duration>,
         f: F,
     ) -> SchedulerResult<JobId>
@@ -158,7 +160,7 @@ where
             crate::error::SchedulerError::MutexError(err.to_string())
         })?;
 
-        inner.schedule_parallel_job(cron_string, human_readable_name, fuzzy_offset, f)
+        inner.schedule_parallel_job(cron_string, human_readable_name, category, fuzzy_offset, f)
     }
 
     /// Schedule a sequential job to run at the specified times. Only one instance of this job can run at a time, so, if
@@ -180,6 +182,7 @@ where
     /// let job_id = scheduler.schedule_sequential_job(
     ///         "*/5 * * * * *",     // run the job on every second divisible by 5 of every minute
     ///         Some("Example Sequential Job".to_string()), //this name will appear in the tracing logs
+    ///         Some("Example Category".to_string()), //this category will appear in the tracing logs
     ///         Some(chrono::Duration::seconds(2)), // we want the fuzzy effect of 2 seconds
     ///         move ||
     ///            {
@@ -205,6 +208,7 @@ where
         &self,
         cron_string: &str,
         human_readable_name: Option<String>,
+        category: Option<String>,
         fuzzy_offset: Option<chrono::Duration>,
         f: F,
     ) -> SchedulerResult<JobId>
@@ -220,6 +224,41 @@ where
             crate::error::SchedulerError::MutexError(err.to_string())
         })?;
 
-        inner.schedule_sequential_job(cron_string, human_readable_name, fuzzy_offset, f)
+        inner.schedule_sequential_job(cron_string, human_readable_name, category, fuzzy_offset, f)
+    }
+
+    /// Stop all running jobs without shutting down the scheduler.
+    ///
+    /// # Returns
+    ///
+    /// A result indicating success or failure for stopping all jobs.
+    pub fn stop_all_jobs(&self) -> SchedulerResult<()> {
+        let mut inner = self.inner.lock().map_err(|err| {
+            warn!("Grizzly Scheduler: Mutex error on stop_all_jobs: {}", err);
+            crate::error::SchedulerError::MutexError(err.to_string())
+        })?;
+        inner.stop_all_jobs();
+        Ok(())
+    }
+
+    /// Stop all jobs that belong to the specified category.
+    ///
+    /// # Arguments
+    ///
+    /// * `category` - The category of jobs to stop.
+    ///
+    /// # Returns
+    ///
+    /// A result indicating success or failure for stopping jobs by category.
+    pub fn stop_jobs_by_category(&self, category: &str) -> SchedulerResult<()> {
+        let mut inner = self.inner.lock().map_err(|err| {
+            warn!(
+                "Grizzly Scheduler: Mutex error on stop_jobs_by_category: {}",
+                err
+            );
+            crate::error::SchedulerError::MutexError(err.to_string())
+        })?;
+        inner.stop_jobs_by_category(category);
+        Ok(())
     }
 }

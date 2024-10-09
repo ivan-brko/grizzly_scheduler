@@ -7,11 +7,13 @@ pub(in crate::scheduler) struct StartedJob {
     #[allow(dead_code)]
     pub join: JoinHandle<()>,
     pub human_readable_name: Option<String>,
+    pub category: Option<String>,
 }
 
 pub(in crate::scheduler) struct NotStartedJob<T> {
     pub parsed_cron: Schedule,
     pub lambda: T,
     pub human_readable_name: Option<String>,
+    pub category: Option<String>,
     pub fuzzy_offset: Option<chrono::Duration>,
 }
